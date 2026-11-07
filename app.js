@@ -191,7 +191,7 @@
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf4eee4);
-  scene.fog = new THREE.Fog(0xf3ecdf, 9, 34);
+  scene.fog = new THREE.Fog(0xf3ecdf, 16, 42);
   const camera = new THREE.PerspectiveCamera(47, window.innerWidth / window.innerHeight, 0.1, 120);
 
   scene.add(new THREE.HemisphereLight(0xfff6ea, 0xc9b79a, 1.25));
@@ -202,14 +202,14 @@
   fill.position.set(4, 2, -3);
   scene.add(fill);
 
-  const ringA = new THREE.TorusGeometry(11.2, 0.16, 8, 90);
-  const ringB = new THREE.TorusGeometry(11.8, 0.1, 8, 90);
+  const ringA = new THREE.TorusGeometry(18, 0.2, 8, 120);
+  const ringB = new THREE.TorusGeometry(18.7, 0.12, 8, 120);
   const ringMatA = new THREE.MeshStandardMaterial({ color: 0xf7f2e8, roughness: 0.9 });
   const ringMatB = new THREE.MeshStandardMaterial({ color: 0xd8cfc0, roughness: 0.94 });
   for (let i = 0; i < 36; i++) {
     const ring = new THREE.Mesh(i % 2 ? ringB : ringA, i % 2 ? ringMatB : ringMatA);
     ring.rotation.x = Math.PI / 2;
-    ring.position.y = -4 + i * 0.72;
+    ring.position.y = -10 + i * 1.05;
     scene.add(ring);
   }
 
@@ -220,7 +220,9 @@
       new THREE.DodecahedronGeometry(size, 0),
       mat(new THREE.Color().setHSL(0.08, 0.18, 0.55 + Math.random() * 0.22), { roughness: 1 })
     );
-    mesh.position.set((Math.random() - 0.5) * 8, -2 + Math.random() * 16, -1 - Math.random() * 8);
+    const arm = Math.random() * Math.PI * 2;
+    const rad = 6 + Math.random() * 10;
+    mesh.position.set(Math.cos(arm) * rad, -10 + Math.random() * 32, Math.sin(arm) * rad);
     mesh.rotation.set(Math.random() * 3, Math.random() * 3, Math.random() * 3);
     mesh.userData.spin = 0.15 + Math.random() * 0.4;
     mesh.userData.base = mesh.position.y;
@@ -844,8 +846,9 @@
 
   const wheel = new THREE.Group();
   scene.add(wheel);
-  const FLIP = 0.78;
-  const ORBIT = 4.4;
+  const FLIP = (Math.PI * 2) / 5;
+  const ORBIT = 11.4;
+  const VIEW = 7.1;
   STATIONS.forEach((station, index) => {
     const group = new THREE.Group();
     const ang = index * FLIP;
@@ -892,8 +895,8 @@
     const ang = x * FLIP;
     wheel.rotation.x = -ang;
     camera.up.set(0, 1, 0);
-    camera.position.set(aimX * 0.35, 1.42 + aimY * 0.12, 3.6);
-    look.set(aimX * 0.2, 1.15, -ORBIT);
+    camera.position.set(aimX * 0.28, 1.62 + aimY * 0.08, -ORBIT + VIEW);
+    look.set(aimX * 0.12, 1.62, -ORBIT);
     camera.lookAt(look);
     keyOffset.set(-2.2, 3.2, 1.6).applyQuaternion(camera.quaternion);
     key.position.copy(camera.position).add(keyOffset);
@@ -948,6 +951,7 @@
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let drag = null;
+  let wheelTimer = 0;
 
   function setPointer(e) {
     pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -981,7 +985,10 @@
     targetP = clamp(drag.p - dy * 0.0065, 0, STATIONS.length - 1);
     if (drag.moved) traveled = true;
   });
-  window.addEventListener("pointerup", () => { drag = null; });
+  window.addEventListener("pointerup", () => {
+    if (drag && drag.moved) targetP = clamp(Math.round(targetP), 0, STATIONS.length - 1);
+    drag = null;
+  });
 
   renderer.domElement.addEventListener("pointermove", (e) => {
     if (drag && drag.moved) {
@@ -1022,6 +1029,10 @@
     const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
     targetP = clamp(targetP - delta * 0.0022, 0, STATIONS.length - 1);
     traveled = true;
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => {
+      targetP = clamp(Math.round(targetP), 0, STATIONS.length - 1);
+    }, 160);
   }, { passive: false });
 
   window.addEventListener("keydown", (e) => {
@@ -1053,6 +1064,7 @@
     knob.style.transform = "translate(-50%, -50%)";
     moveAxis = 0;
     stickX = 0;
+    targetP = clamp(Math.round(targetP), 0, STATIONS.length - 1);
   }
   joy.addEventListener("pointerup", endJoy);
   joy.addEventListener("pointercancel", endJoy);
