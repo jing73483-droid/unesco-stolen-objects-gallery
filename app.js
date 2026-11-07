@@ -128,20 +128,21 @@
       ],
     },
     {
-      primary: "VM-CU-25-001",
+      primary: "VM-CO-24-006",
       furniture: [
-        { type: "panel", w: 2.45, h: 2.85, color: "#6a3533", x: 0.12, y: 1.68, z: -0.42 },
-        { type: "cyl", r: 0.4, h: 1.95, color: "#f0e6d4", x: -1.08, z: 0.02 },
-        { type: "box", w: 0.52, h: 1.2, d: 0.48, color: "#e4d5bc", x: -0.18, z: 0.42 },
-        { type: "box", w: 0.46, h: 1.48, d: 0.44, color: "#e7dcc8", x: 0.52, z: 0.48 },
-        { type: "box", w: 0.42, h: 1.82, d: 0.4, color: "#a24b3a", x: 1.15, z: -0.02 },
+        { type: "panel", w: 1.65, h: 2.7, color: "#5c2a32", x: -1.0, z: -0.35 },
+        { type: "panel", w: 1.85, h: 2.85, color: "#c46a48", x: 0.65, z: -0.1 },
+        { type: "box", w: 0.52, h: 1.2, d: 0.5, color: "#e7dcc8", x: -1.6, z: 0.48 },
+        { type: "box", w: 0.55, h: 2.0, d: 0.52, color: "#c46a48", x: -0.28, z: 0.3 },
+        { type: "box", w: 0.46, h: 1.12, d: 0.44, color: "#c46a48", x: 0.42, z: 0.88 },
+        { type: "cyl", r: 0.4, h: 1.8, color: "#e6dccb", x: 1.7, z: 0.12 },
       ],
       objects: [
-        { id: "VM-CN-25-004", kind: "arhat", x: -1.08, y: 1.95, z: 0.02, s: 1.15 },
-        { id: "VM-CU-25-001", kind: "crowd", x: 0.12, y: 1.95, z: -0.32 },
-        { id: "VM-CY-24-008", kind: "capital", x: -0.18, y: 1.2, z: 0.42, s: 1.05 },
-        { id: "VM-GR-25-010", kind: "smallFigure", x: 0.52, y: 1.48, z: 0.48, s: 1.25 },
-        { id: "VM-ES-25-003", kind: "portrait", x: 1.15, y: 2.02, z: -0.02, s: 0.85 },
+        { id: "VM-CM-25-002", kind: "tusk", x: -1.55, y: 1.9, z: 0.12, s: 1.15 },
+        { id: "VM-BE-25-001", kind: "goldCross", x: -0.95, y: 1.55, z: 0.02, s: 1.25 },
+        { id: "VM-CO-24-006", kind: "mineros", x: 0.65, y: 1.85, z: 0.02 },
+        { id: "VM-CI-24-010", kind: "goldDisc", x: 0.42, y: 1.28, z: 0.88, s: 1.2 },
+        { id: "VM-BF-25-001", kind: "smallFigure", x: 1.35, y: 1.65, z: 0.38, s: 1.4 },
       ],
     },
     {
@@ -190,7 +191,7 @@
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf4eee4);
-  scene.fog = new THREE.Fog(0xf3ecdf, 16, 42);
+  scene.fog = new THREE.Fog(0xf3ecdf, 9, 34);
   const camera = new THREE.PerspectiveCamera(47, window.innerWidth / window.innerHeight, 0.1, 120);
 
   scene.add(new THREE.HemisphereLight(0xfff6ea, 0xc9b79a, 1.25));
@@ -201,12 +202,13 @@
   fill.position.set(4, 2, -3);
   scene.add(fill);
 
-  const ringGeo = new THREE.TorusGeometry(18, 0.46, 10, 90);
-  const ringMat = new THREE.MeshStandardMaterial({ color: 0xe3d5c2, roughness: 0.96 });
-  for (let i = 0; i < 16; i++) {
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.rotation.x = Math.PI / 2;
-    ring.position.y = -7 + i * 2.2;
+  const ringA = new THREE.TorusGeometry(8.6, 0.14, 8, 96);
+  const ringB = new THREE.TorusGeometry(9.15, 0.09, 8, 96);
+  const ringMatA = new THREE.MeshStandardMaterial({ color: 0xf7f2e8, roughness: 0.9 });
+  const ringMatB = new THREE.MeshStandardMaterial({ color: 0xd8cfc0, roughness: 0.94 });
+  for (let i = 0; i < 72; i++) {
+    const ring = new THREE.Mesh(i % 2 ? ringB : ringA, i % 2 ? ringMatB : ringMatA);
+    ring.position.z = 12 - i * 1.15;
     scene.add(ring);
   }
 
@@ -217,9 +219,7 @@
       new THREE.DodecahedronGeometry(size, 0),
       mat(new THREE.Color().setHSL(0.08, 0.18, 0.55 + Math.random() * 0.22), { roughness: 1 })
     );
-    const arm = Math.random() * Math.PI * 2;
-    const rad = 6 + Math.random() * 10;
-    mesh.position.set(Math.cos(arm) * rad, -10 + Math.random() * 32, Math.sin(arm) * rad);
+    mesh.position.set((Math.random() - 0.5) * 7, -0.2 + Math.random() * 3.4, 4 - Math.random() * 78);
     mesh.rotation.set(Math.random() * 3, Math.random() * 3, Math.random() * 3);
     mesh.userData.spin = 0.15 + Math.random() * 0.4;
     mesh.userData.base = mesh.position.y;
@@ -414,12 +414,12 @@
       const g = new THREE.Group();
       g.add(lathe([
         [0.02, 0], [0.2, 0], [0.3, 0.08], [0.32, 0.24], [0.22, 0.4], [0.12, 0.48], [0.1, 0.58], [0.12, 0.66], [0.07, 0.74],
-      ], "#b85c3e", { roughness: 0.78 }));
+      ], "#d8c4a4", { roughness: 0.72 }));
       const band = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.018, 8, 24), mat("#3a2a22", { roughness: 0.6 }));
       band.rotation.x = Math.PI / 2;
       band.position.y = 0.28;
       g.add(band);
-      const spout = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), mat("#b85c3e", { roughness: 0.78 }));
+      const spout = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), mat("#d8c4a4", { roughness: 0.72 }));
       spout.scale.set(1.5, 0.75, 0.85);
       spout.position.set(0.2, 0.32, 0);
       g.add(spout);
@@ -429,7 +429,7 @@
       const g = new THREE.Group();
       g.add(lathe([
         [0.02, 0], [0.18, 0], [0.24, 0.06], [0.26, 0.18], [0.18, 0.32], [0.1, 0.38], [0.09, 0.44],
-      ], "#3c3a38", { roughness: 0.55, metalness: 0.12 }));
+      ], "#6e3428", { roughness: 0.62 }));
       const stripe = mat("#2a1c18", { roughness: 0.5 });
       for (let i = 0; i < 3; i++) {
         const ring = new THREE.Mesh(new THREE.TorusGeometry(0.2 - i * 0.012, 0.012, 6, 28), stripe);
@@ -808,7 +808,11 @@
 
   function addFurniture(parent, spec) {
     let mesh;
-    const material = mat(spec.color, { roughness: spec.type === "panel" ? 0.94 : 0.88 });
+    const material = new THREE.MeshStandardMaterial({
+      map: plasterMap(spec.color),
+      color: spec.color,
+      roughness: spec.type === "panel" ? 0.94 : 0.9,
+    });
     if (spec.type === "cyl") mesh = new THREE.Mesh(new THREE.CylinderGeometry(spec.r, spec.r * 0.98, spec.h, 28), material);
     else if (spec.type === "panel") mesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w, spec.h, 0.08), material);
     else mesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w, spec.h, spec.d), material);
@@ -837,11 +841,9 @@
     });
   }
 
-  const pivots = [];
   STATIONS.forEach((station, index) => {
-    const pivot = new THREE.Group();
     const group = new THREE.Group();
-    group.position.y = -1.55;
+    group.position.set(0, 0, -index * GAP);
     station.furniture.forEach((spec) => addFurniture(group, spec));
     addShaft(group);
     station.objects.forEach((spec) => {
@@ -854,9 +856,7 @@
       tag(object, item);
       group.add(object);
     });
-    pivot.add(group);
-    scene.add(pivot);
-    pivots.push(pivot);
+    scene.add(group);
   });
 
   function matches(item) {
@@ -879,33 +879,14 @@
     $("regions-btn").classList.toggle("on", !!filter.region);
   }
 
-  let fallV = 0;
-
   function updateCamera(t) {
     const n = STATIONS.length - 1;
     const x = Math.max(0, Math.min(n, t));
-    pivots.forEach((pivot, index) => {
-      const delta = index - x;
-      const d = Math.max(-1.2, Math.min(1.2, delta));
-      const ad = Math.min(Math.abs(d), 1);
-      let flip;
-      let rise;
-      if (d >= 0) {
-        flip = Math.pow(Math.min(d, 1), 0.7) * 1.75;
-        rise = Math.pow(Math.min(d, 1), 1.8) * 7.2;
-      } else {
-        flip = -Math.pow(ad, 0.55) * 2.6;
-        rise = Math.pow(ad, 0.45) * 8;
-      }
-      pivot.position.set(0, 1.55 + rise, -5.2);
-      pivot.rotation.set(flip, 0, 0);
-      pivot.visible = Math.abs(delta) < 1.15;
-    });
-    camera.up.set(0, 1, 0);
-    camera.position.set(aimX * 0.12, 1.9 + aimY * 0.04, 2.15);
-    look.set(aimX * 0.04, 1.55, -5.2);
+    const z = 6.4 - x * GAP;
+    camera.position.set(aimX * 0.7, 1.5 + aimY * 0.25, z);
+    look.set(aimX * 1.15, 1.28 + aimY * 0.15, z - 7.5);
     camera.lookAt(look);
-    keyOffset.set(-2.2, 3.2, 1.6).applyQuaternion(camera.quaternion);
+    keyOffset.set(-2.4, 3.6, 2.2).applyQuaternion(camera.quaternion);
     key.position.copy(camera.position).add(keyOffset);
     key.target.position.copy(look);
   }
@@ -917,18 +898,7 @@
     }
     aimX += (lookX + stickX * 0.9 - aimX) * 0.12;
     aimY += (lookY - aimY) * 0.12;
-    if (drag) {
-      fallV = 0;
-      p += (targetP - p) * 0.45;
-    } else {
-      const diff = targetP - p;
-      fallV = fallV * 0.92 + diff * 0.0032;
-      p += fallV;
-      if (Math.abs(diff) < 0.0015 && Math.abs(fallV) < 0.0015) {
-        p = targetP;
-        fallV = 0;
-      }
-    }
+    p += (targetP - p) * 0.06;
     updateCamera(p);
     const time = performance.now() * 0.001;
     debris.forEach((d) => {
@@ -969,7 +939,6 @@
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let drag = null;
-  let wheelTimer = 0;
 
   function setPointer(e) {
     pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -992,21 +961,17 @@
 
   renderer.domElement.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
-    drag = { x: e.clientX, y: e.clientY, p: targetP, lx: lookX, moved: false };
+    drag = { x: e.clientX, y: e.clientY, lx: lookX, ly: lookY, moved: false };
   });
   window.addEventListener("pointermove", (e) => {
     if (!drag) return;
     const dx = e.clientX - drag.x;
     const dy = e.clientY - drag.y;
     if (Math.hypot(dx, dy) > 4) drag.moved = true;
-    lookX = clamp(drag.lx - dx * 0.0028, -1.3, 1.3);
-    targetP = clamp(drag.p - dy * 0.0065, 0, STATIONS.length - 1);
-    if (drag.moved) traveled = true;
+    lookX = clamp(drag.lx - dx * 0.0035, -1.5, 1.5);
+    lookY = clamp(drag.ly + dy * 0.0028, -0.7, 0.7);
   });
-  window.addEventListener("pointerup", () => {
-    if (drag && drag.moved) targetP = clamp(Math.round(targetP), 0, STATIONS.length - 1);
-    drag = null;
-  });
+  window.addEventListener("pointerup", () => { drag = null; });
 
   renderer.domElement.addEventListener("pointermove", (e) => {
     if (drag && drag.moved) {
@@ -1045,25 +1010,21 @@
     if ($("regions").classList.contains("open") || !$("search").hidden || !$("detail").hidden) return;
     e.preventDefault();
     const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-    targetP = clamp(targetP - delta * 0.0022, 0, STATIONS.length - 1);
+    targetP = clamp(targetP + delta * 0.0015, 0, STATIONS.length - 1);
     traveled = true;
-    clearTimeout(wheelTimer);
-    wheelTimer = setTimeout(() => {
-      targetP = clamp(Math.round(targetP), 0, STATIONS.length - 1);
-    }, 160);
   }, { passive: false });
 
   window.addEventListener("keydown", (e) => {
-    if (e.target && e.target.matches && e.target.matches("input, textarea")) {
+    if (e.target.matches("input, textarea")) {
       if (e.key === "Escape") e.target.blur();
       return;
     }
     if (e.key === "Escape") { closeTop(); return; }
-    if (["ArrowUp", "ArrowRight", "PageUp"].includes(e.key)) {
+    if (["ArrowDown", "ArrowRight", "PageDown"].includes(e.key)) {
       targetP = Math.min(STATIONS.length - 1, Math.round(targetP) + 1);
       traveled = true;
     }
-    if (["ArrowDown", "ArrowLeft", "PageDown"].includes(e.key)) {
+    if (["ArrowUp", "ArrowLeft", "PageUp"].includes(e.key)) {
       targetP = Math.max(0, Math.round(targetP) - 1);
       traveled = true;
     }
@@ -1082,7 +1043,6 @@
     knob.style.transform = "translate(-50%, -50%)";
     moveAxis = 0;
     stickX = 0;
-    targetP = clamp(Math.round(targetP), 0, STATIONS.length - 1);
   }
   joy.addEventListener("pointerup", endJoy);
   joy.addEventListener("pointercancel", endJoy);
@@ -1333,8 +1293,16 @@
   discover.addEventListener("click", () => openDetail(currentItem));
 
   $("home-btn").addEventListener("click", () => {
-    document.body.classList.add("home");
+    document.body.classList.remove("home");
+    targetP = 0;
+    p = 0;
+    lookX = 0;
+    lookY = 0;
+    aimX = 0;
+    aimY = 0;
+    traveled = false;
     closeTop();
+    updateCamera(0);
   });
   $("visit").addEventListener("click", () => {
     document.body.classList.remove("home");
