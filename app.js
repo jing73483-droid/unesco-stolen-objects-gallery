@@ -128,21 +128,20 @@
       ],
     },
     {
-      primary: "VM-CO-24-006",
+      primary: "VM-CU-25-001",
       furniture: [
-        { type: "panel", w: 1.65, h: 2.7, color: "#5c2a32", x: -1.0, z: -0.35 },
-        { type: "panel", w: 1.85, h: 2.85, color: "#c46a48", x: 0.65, z: -0.1 },
-        { type: "box", w: 0.52, h: 1.2, d: 0.5, color: "#e7dcc8", x: -1.6, z: 0.48 },
-        { type: "box", w: 0.55, h: 2.0, d: 0.52, color: "#c46a48", x: -0.28, z: 0.3 },
-        { type: "box", w: 0.46, h: 1.12, d: 0.44, color: "#c46a48", x: 0.42, z: 0.88 },
-        { type: "cyl", r: 0.4, h: 1.8, color: "#e6dccb", x: 1.7, z: 0.12 },
+        { type: "panel", w: 2.45, h: 2.85, color: "#6a3533", x: 0.12, y: 1.68, z: -0.42 },
+        { type: "cyl", r: 0.4, h: 1.95, color: "#f0e6d4", x: -1.08, z: 0.02 },
+        { type: "box", w: 0.52, h: 1.2, d: 0.48, color: "#e4d5bc", x: -0.18, z: 0.42 },
+        { type: "box", w: 0.46, h: 1.48, d: 0.44, color: "#e7dcc8", x: 0.52, z: 0.48 },
+        { type: "box", w: 0.42, h: 1.82, d: 0.4, color: "#a24b3a", x: 1.15, z: -0.02 },
       ],
       objects: [
-        { id: "VM-CM-25-002", kind: "tusk", x: -1.55, y: 1.9, z: 0.12, s: 1.15 },
-        { id: "VM-BE-25-001", kind: "goldCross", x: -0.95, y: 1.55, z: 0.02, s: 1.25 },
-        { id: "VM-CO-24-006", kind: "mineros", x: 0.65, y: 1.85, z: 0.02 },
-        { id: "VM-CI-24-010", kind: "goldDisc", x: 0.42, y: 1.28, z: 0.88, s: 1.2 },
-        { id: "VM-BF-25-001", kind: "smallFigure", x: 1.35, y: 1.65, z: 0.38, s: 1.4 },
+        { id: "VM-CN-25-004", kind: "arhat", x: -1.08, y: 1.95, z: 0.02, s: 1.15 },
+        { id: "VM-CU-25-001", kind: "crowd", x: 0.12, y: 1.95, z: -0.32 },
+        { id: "VM-CY-24-008", kind: "capital", x: -0.18, y: 1.2, z: 0.42, s: 1.05 },
+        { id: "VM-GR-25-010", kind: "smallFigure", x: 0.52, y: 1.48, z: 0.48, s: 1.25 },
+        { id: "VM-ES-25-003", kind: "portrait", x: 1.15, y: 2.02, z: -0.02, s: 0.85 },
       ],
     },
     {
@@ -202,14 +201,12 @@
   fill.position.set(4, 2, -3);
   scene.add(fill);
 
-  const ringA = new THREE.TorusGeometry(18, 0.2, 8, 120);
-  const ringB = new THREE.TorusGeometry(18.7, 0.12, 8, 120);
-  const ringMatA = new THREE.MeshStandardMaterial({ color: 0xf7f2e8, roughness: 0.9 });
-  const ringMatB = new THREE.MeshStandardMaterial({ color: 0xd8cfc0, roughness: 0.94 });
-  for (let i = 0; i < 36; i++) {
-    const ring = new THREE.Mesh(i % 2 ? ringB : ringA, i % 2 ? ringMatB : ringMatA);
+  const ringGeo = new THREE.TorusGeometry(18, 0.46, 10, 90);
+  const ringMat = new THREE.MeshStandardMaterial({ color: 0xe3d5c2, roughness: 0.96 });
+  for (let i = 0; i < 16; i++) {
+    const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.rotation.x = Math.PI / 2;
-    ring.position.y = -10 + i * 1.05;
+    ring.position.y = -7 + i * 2.2;
     scene.add(ring);
   }
 
@@ -417,12 +414,12 @@
       const g = new THREE.Group();
       g.add(lathe([
         [0.02, 0], [0.2, 0], [0.3, 0.08], [0.32, 0.24], [0.22, 0.4], [0.12, 0.48], [0.1, 0.58], [0.12, 0.66], [0.07, 0.74],
-      ], "#d8c4a4", { roughness: 0.72 }));
+      ], "#b85c3e", { roughness: 0.78 }));
       const band = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.018, 8, 24), mat("#3a2a22", { roughness: 0.6 }));
       band.rotation.x = Math.PI / 2;
       band.position.y = 0.28;
       g.add(band);
-      const spout = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), mat("#d8c4a4", { roughness: 0.72 }));
+      const spout = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), mat("#b85c3e", { roughness: 0.78 }));
       spout.scale.set(1.5, 0.75, 0.85);
       spout.position.set(0.2, 0.32, 0);
       g.add(spout);
@@ -432,7 +429,7 @@
       const g = new THREE.Group();
       g.add(lathe([
         [0.02, 0], [0.18, 0], [0.24, 0.06], [0.26, 0.18], [0.18, 0.32], [0.1, 0.38], [0.09, 0.44],
-      ], "#6e3428", { roughness: 0.62 }));
+      ], "#3c3a38", { roughness: 0.55, metalness: 0.12 }));
       const stripe = mat("#2a1c18", { roughness: 0.5 });
       for (let i = 0; i < 3; i++) {
         const ring = new THREE.Mesh(new THREE.TorusGeometry(0.2 - i * 0.012, 0.012, 6, 28), stripe);
@@ -811,11 +808,7 @@
 
   function addFurniture(parent, spec) {
     let mesh;
-    const material = new THREE.MeshStandardMaterial({
-      map: plasterMap(spec.color),
-      color: spec.color,
-      roughness: spec.type === "panel" ? 0.94 : 0.9,
-    });
+    const material = mat(spec.color, { roughness: spec.type === "panel" ? 0.94 : 0.88 });
     if (spec.type === "cyl") mesh = new THREE.Mesh(new THREE.CylinderGeometry(spec.r, spec.r * 0.98, spec.h, 28), material);
     else if (spec.type === "panel") mesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w, spec.h, 0.08), material);
     else mesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w, spec.h, spec.d), material);
@@ -844,16 +837,14 @@
     });
   }
 
-  const wheel = new THREE.Group();
-  scene.add(wheel);
-  const FLIP = (Math.PI * 2) / 5;
-  const ORBIT = 11.4;
-  const VIEW = 7.1;
+  const STEP = 1.25;
+  const CLUSTER_R = 4.1;
+  const CAM_R = 10.2;
   STATIONS.forEach((station, index) => {
     const group = new THREE.Group();
-    const ang = index * FLIP;
-    group.position.set(0, Math.sin(ang) * ORBIT, -Math.cos(ang) * ORBIT);
-    group.rotation.x = ang;
+    const ang = index * STEP;
+    group.position.set(Math.sin(ang) * CLUSTER_R, 0, Math.cos(ang) * CLUSTER_R);
+    group.rotation.y = ang;
     station.furniture.forEach((spec) => addFurniture(group, spec));
     addShaft(group);
     station.objects.forEach((spec) => {
@@ -866,7 +857,7 @@
       tag(object, item);
       group.add(object);
     });
-    wheel.add(group);
+    scene.add(group);
   });
 
   function matches(item) {
@@ -892,11 +883,14 @@
   function updateCamera(t) {
     const n = STATIONS.length - 1;
     const x = Math.max(0, Math.min(n, t));
-    const ang = x * FLIP;
-    wheel.rotation.x = -ang;
+    const i = Math.floor(x);
+    const f = x - i;
+    const ease = f * f * (3 - 2 * f);
+    const ang = (i + ease) * STEP;
+    const dip = Math.sin(Math.min(f, 1) * Math.PI) * 0.45;
     camera.up.set(0, 1, 0);
-    camera.position.set(aimX * 0.28, 1.62 + aimY * 0.08, -ORBIT + VIEW);
-    look.set(aimX * 0.12, 1.62, -ORBIT);
+    camera.position.set(Math.sin(ang) * CAM_R, 1.72 - dip + aimY * 0.12, Math.cos(ang) * CAM_R);
+    look.set(Math.sin(ang) * 0.55 + Math.cos(ang) * aimX, 1.42 + aimY, Math.cos(ang) * 0.55 - Math.sin(ang) * aimX);
     camera.lookAt(look);
     keyOffset.set(-2.2, 3.2, 1.6).applyQuaternion(camera.quaternion);
     key.position.copy(camera.position).add(keyOffset);
