@@ -202,13 +202,14 @@
   fill.position.set(4, 2, -3);
   scene.add(fill);
 
-  const ringA = new THREE.TorusGeometry(8.6, 0.14, 8, 96);
-  const ringB = new THREE.TorusGeometry(9.15, 0.09, 8, 96);
+  const ringA = new THREE.TorusGeometry(11.2, 0.16, 8, 90);
+  const ringB = new THREE.TorusGeometry(11.8, 0.1, 8, 90);
   const ringMatA = new THREE.MeshStandardMaterial({ color: 0xf7f2e8, roughness: 0.9 });
   const ringMatB = new THREE.MeshStandardMaterial({ color: 0xd8cfc0, roughness: 0.94 });
-  for (let i = 0; i < 72; i++) {
+  for (let i = 0; i < 36; i++) {
     const ring = new THREE.Mesh(i % 2 ? ringB : ringA, i % 2 ? ringMatB : ringMatA);
-    ring.position.z = 12 - i * 1.15;
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = -4 + i * 0.72;
     scene.add(ring);
   }
 
@@ -219,7 +220,7 @@
       new THREE.DodecahedronGeometry(size, 0),
       mat(new THREE.Color().setHSL(0.08, 0.18, 0.55 + Math.random() * 0.22), { roughness: 1 })
     );
-    mesh.position.set((Math.random() - 0.5) * 7, -0.2 + Math.random() * 3.4, 4 - Math.random() * 78);
+    mesh.position.set((Math.random() - 0.5) * 8, -2 + Math.random() * 16, -1 - Math.random() * 8);
     mesh.rotation.set(Math.random() * 3, Math.random() * 3, Math.random() * 3);
     mesh.userData.spin = 0.15 + Math.random() * 0.4;
     mesh.userData.base = mesh.position.y;
@@ -841,9 +842,15 @@
     });
   }
 
+  const wheel = new THREE.Group();
+  scene.add(wheel);
+  const FLIP = 0.78;
+  const ORBIT = 4.4;
   STATIONS.forEach((station, index) => {
     const group = new THREE.Group();
-    group.position.set(0, 0, -index * GAP);
+    const ang = index * FLIP;
+    group.position.set(0, Math.sin(ang) * ORBIT, -Math.cos(ang) * ORBIT);
+    group.rotation.x = ang;
     station.furniture.forEach((spec) => addFurniture(group, spec));
     addShaft(group);
     station.objects.forEach((spec) => {
@@ -856,7 +863,7 @@
       tag(object, item);
       group.add(object);
     });
-    scene.add(group);
+    wheel.add(group);
   });
 
   function matches(item) {
@@ -882,11 +889,13 @@
   function updateCamera(t) {
     const n = STATIONS.length - 1;
     const x = Math.max(0, Math.min(n, t));
-    const z = 6.4 - x * GAP;
-    camera.position.set(aimX * 0.7, 1.5 + aimY * 0.25, z);
-    look.set(aimX * 1.15, 1.28 + aimY * 0.15, z - 7.5);
+    const ang = x * FLIP;
+    wheel.rotation.x = -ang;
+    camera.up.set(0, 1, 0);
+    camera.position.set(aimX * 0.35, 1.42 + aimY * 0.12, 3.6);
+    look.set(aimX * 0.2, 1.15, -ORBIT);
     camera.lookAt(look);
-    keyOffset.set(-2.4, 3.6, 2.2).applyQuaternion(camera.quaternion);
+    keyOffset.set(-2.2, 3.2, 1.6).applyQuaternion(camera.quaternion);
     key.position.copy(camera.position).add(keyOffset);
     key.target.position.copy(look);
   }
@@ -961,15 +970,16 @@
 
   renderer.domElement.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
-    drag = { x: e.clientX, y: e.clientY, lx: lookX, ly: lookY, moved: false };
+    drag = { x: e.clientX, y: e.clientY, p: targetP, lx: lookX, moved: false };
   });
   window.addEventListener("pointermove", (e) => {
     if (!drag) return;
     const dx = e.clientX - drag.x;
     const dy = e.clientY - drag.y;
     if (Math.hypot(dx, dy) > 4) drag.moved = true;
-    lookX = clamp(drag.lx - dx * 0.0035, -1.5, 1.5);
-    lookY = clamp(drag.ly + dy * 0.0028, -0.7, 0.7);
+    lookX = clamp(drag.lx - dx * 0.0028, -1.3, 1.3);
+    targetP = clamp(drag.p - dy * 0.0065, 0, STATIONS.length - 1);
+    if (drag.moved) traveled = true;
   });
   window.addEventListener("pointerup", () => { drag = null; });
 
@@ -1010,7 +1020,7 @@
     if ($("regions").classList.contains("open") || !$("search").hidden || !$("detail").hidden) return;
     e.preventDefault();
     const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-    targetP = clamp(targetP + delta * 0.0015, 0, STATIONS.length - 1);
+    targetP = clamp(targetP - delta * 0.0022, 0, STATIONS.length - 1);
     traveled = true;
   }, { passive: false });
 
@@ -1020,11 +1030,11 @@
       return;
     }
     if (e.key === "Escape") { closeTop(); return; }
-    if (["ArrowDown", "ArrowRight", "PageDown"].includes(e.key)) {
+    if (["ArrowUp", "ArrowRight", "PageUp"].includes(e.key)) {
       targetP = Math.min(STATIONS.length - 1, Math.round(targetP) + 1);
       traveled = true;
     }
-    if (["ArrowUp", "ArrowLeft", "PageUp"].includes(e.key)) {
+    if (["ArrowDown", "ArrowLeft", "PageDown"].includes(e.key)) {
       targetP = Math.max(0, Math.round(targetP) - 1);
       traveled = true;
     }
