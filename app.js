@@ -837,14 +837,11 @@
     });
   }
 
-  const STEP = 1.25;
-  const CLUSTER_R = 4.1;
-  const CAM_R = 10.2;
+  const pivots = [];
   STATIONS.forEach((station, index) => {
+    const pivot = new THREE.Group();
     const group = new THREE.Group();
-    const ang = index * STEP;
-    group.position.set(Math.sin(ang) * CLUSTER_R, 0, Math.cos(ang) * CLUSTER_R);
-    group.rotation.y = ang;
+    group.position.y = -1.55;
     station.furniture.forEach((spec) => addFurniture(group, spec));
     addShaft(group);
     station.objects.forEach((spec) => {
@@ -857,7 +854,9 @@
       tag(object, item);
       group.add(object);
     });
-    scene.add(group);
+    pivot.add(group);
+    scene.add(pivot);
+    pivots.push(pivot);
   });
 
   function matches(item) {
@@ -880,17 +879,31 @@
     $("regions-btn").classList.toggle("on", !!filter.region);
   }
 
+  let fallV = 0;
+
   function updateCamera(t) {
     const n = STATIONS.length - 1;
     const x = Math.max(0, Math.min(n, t));
-    const i = Math.floor(x);
-    const f = x - i;
-    const ease = f * f * (3 - 2 * f);
-    const ang = (i + ease) * STEP;
-    const dip = Math.sin(Math.min(f, 1) * Math.PI) * 0.45;
+    pivots.forEach((pivot, index) => {
+      const delta = index - x;
+      const d = Math.max(-1.2, Math.min(1.2, delta));
+      const ad = Math.min(Math.abs(d), 1);
+      let flip;
+      let rise;
+      if (d >= 0) {
+        flip = Math.pow(Math.min(d, 1), 0.7) * 1.75;
+        rise = Math.pow(Math.min(d, 1), 1.8) * 7.2;
+      } else {
+        flip = -Math.pow(ad, 0.55) * 2.6;
+        rise = Math.pow(ad, 0.45) * 8;
+      }
+      pivot.position.set(0, 1.55 + rise, -5.2);
+      pivot.rotation.set(flip, 0, 0);
+      pivot.visible = Math.abs(delta) < 1.15;
+    });
     camera.up.set(0, 1, 0);
-    camera.position.set(Math.sin(ang) * CAM_R, 1.72 - dip + aimY * 0.12, Math.cos(ang) * CAM_R);
-    look.set(Math.sin(ang) * 0.55 + Math.cos(ang) * aimX, 1.42 + aimY, Math.cos(ang) * 0.55 - Math.sin(ang) * aimX);
+    camera.position.set(aimX * 0.12, 1.9 + aimY * 0.04, 2.15);
+    look.set(aimX * 0.04, 1.55, -5.2);
     camera.lookAt(look);
     keyOffset.set(-2.2, 3.2, 1.6).applyQuaternion(camera.quaternion);
     key.position.copy(camera.position).add(keyOffset);
@@ -904,7 +917,18 @@
     }
     aimX += (lookX + stickX * 0.9 - aimX) * 0.12;
     aimY += (lookY - aimY) * 0.12;
-    p += (targetP - p) * 0.06;
+    if (drag) {
+      fallV = 0;
+      p += (targetP - p) * 0.45;
+    } else {
+      const diff = targetP - p;
+      fallV = fallV * 0.92 + diff * 0.0032;
+      p += fallV;
+      if (Math.abs(diff) < 0.0015 && Math.abs(fallV) < 0.0015) {
+        p = targetP;
+        fallV = 0;
+      }
+    }
     updateCamera(p);
     const time = performance.now() * 0.001;
     debris.forEach((d) => {
@@ -1030,7 +1054,7 @@
   }, { passive: false });
 
   window.addEventListener("keydown", (e) => {
-    if (e.target.matches("input, textarea")) {
+    if (e.target && e.target.matches && e.target.matches("input, textarea")) {
       if (e.key === "Escape") e.target.blur();
       return;
     }
@@ -1309,16 +1333,8 @@
   discover.addEventListener("click", () => openDetail(currentItem));
 
   $("home-btn").addEventListener("click", () => {
-    document.body.classList.remove("home");
-    targetP = 0;
-    p = 0;
-    lookX = 0;
-    lookY = 0;
-    aimX = 0;
-    aimY = 0;
-    traveled = false;
+    document.body.classList.add("home");
     closeTop();
-    updateCamera(0);
   });
   $("visit").addEventListener("click", () => {
     document.body.classList.remove("home");
